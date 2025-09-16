@@ -8,19 +8,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('medicos', function (Blueprint $table) {
-            $table->foreignId('user_id')
-                  ->nullable()
-                  ->constrained('users')
-                  ->onDelete('cascade');
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->enum('role', ['admin', 'medico', 'recepcionista'])->default('recepcionista');
+            $table->rememberToken();
+            $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::table('medicos', function (Blueprint $table) {
-            $table->dropForeign(['user_id']);
-            $table->dropColumn('user_id');
-        });
+        Schema::dropIfExists('users');
     }
 };

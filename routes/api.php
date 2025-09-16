@@ -19,7 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('perfil', [AuthController::class, 'me']);
 
-    Route::middleware('role:admin,recepcionista')->group(function () {
+    Route::middleware(['auth:sanctum', 'role:admin,recepcionista'])->group(function () {
         Route::apiResource('citas', CitasController::class)->except(['destroy']);
         Route::apiResource('pacientes', PacientesController::class);
         
@@ -34,12 +34,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('consultorios/por-medico/{medicoId}', [ConsultoriosController::class, 'porMedico']);
     });
 
-    Route::middleware('role:medico')->group(function () {
+    Route::middleware(['auth:sanctum', 'role:medico'])->group(function () {
         Route::get('mis-citas', [CitasController::class, 'misCitas']);
         Route::put('citas/{id}/estado', [CitasController::class, 'actualizarEstado']);
     });
 
-    Route::middleware('role:admin')->group(function () {
+    Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
         Route::apiResource('medicos', MedicosController::class)->except(['index', 'show']);
         Route::apiResource('horarios-medicos', HorariosMedicosController::class)->except(['index', 'show']);
         Route::apiResource('consultorios', ConsultoriosController::class)->except(['index', 'show']);

@@ -25,7 +25,8 @@ Incluye autenticación con **Laravel Sanctum** (token-based) para proteger rutas
 ```bash
 git clone https://github.com/tu-usuario/api-citas-medicas.git
 cd api-citas-medicas
-Instalar dependencias:
+
+  Instalar dependencias:
 
 bash
 Copy code
@@ -86,10 +87,10 @@ Elimina el token activo.
 
 🛣️ Rutas Principales (Endpoints)
 Método	Ruta	Descripción	Protegida
-POST	/api/register	Registro de usuario	❌
-POST	/api/login	Inicio de sesión	❌
-POST	/api/logout	Cerrar sesión	✅
-GET	/api/citas	Listar citas	✅
+POST	/api/register	Registro de usuario	
+POST	/api/login	Inicio de sesión	
+POST	/api/logout	Cerrar sesión	
+GET	/api/citas	Listar citas	
 POST	/api/citas	Crear cita	✅
 GET	/api/citas/{id}	Mostrar cita específica	✅
 PUT	/api/citas/{id}	Actualizar cita	✅
@@ -125,6 +126,9 @@ public function test_usuario_autenticado_puede_crear_cita()
 
     $response->assertStatus(201);
 }
+
+
+
 🧰 Herramientas de Desarrollo
 Laravel 10
 
@@ -136,7 +140,9 @@ PHPUnit (pruebas)
 
 Postman (colección incluida)
 
-🌐 Uso con Postman
+
+
+ Uso con Postman
 Importa el archivo postman_collection.json.
 
 Ejecuta la request Register o Login para obtener el token.
@@ -164,7 +170,3 @@ Usa un servidor web como Nginx o Apache apuntando a /public.
 Este proyecto está bajo la licencia MIT.
 Puedes usarlo, modificarlo y distribuirlo libremente.
 
-👨‍💻 Autor
-Miguel Ángel Rodríguez
-📧 tu-email@dominio.com
-🔗 GitHub

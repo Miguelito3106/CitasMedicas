@@ -9,9 +9,7 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    /**
-     * Registro de usuario
-     */
+
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -25,9 +23,8 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        // Solo los administradores pueden crear usuarios con roles específicos
-        $role = 'recepcionista'; // valor por defecto
-        if ($request->user() && $request->user()->isAdmin() && $request->has('role')) {
+        $role = 'recepcionista'; 
+        if ($request->user() && $request->user()->role === 'admin' && $request->has('role')) {
             $role = $request->role;
         }
 
@@ -73,9 +70,7 @@ class AuthController extends Controller
         ], 200);
     }
 
-    /**
-     * Cerrar sesión
-     */
+
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
@@ -85,9 +80,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Obtener usuario autenticado
-     */
     public function me(Request $request)
     {
         return response()->json([
@@ -95,18 +87,13 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Obtener todos los usuarios (solo admin)
-     */
     public function indexUsuarios()
     {
         $usuarios = User::all();
         return response()->json($usuarios);
     }
 
-    /**
-     * Actualizar usuario (solo admin)
-     */
+
     public function actualizarUsuario(Request $request, $id)
     {
         $usuario = User::find($id);
@@ -129,9 +116,7 @@ class AuthController extends Controller
         return response()->json($usuario);
     }
 
-    /**
-     * Eliminar usuario (solo admin)
-     */
+  
     public function eliminarUsuario($id)
     {
         $usuario = User::find($id);
@@ -140,8 +125,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Usuario no encontrado'], 404);
         }
 
-        // No permitir auto-eliminación
-        if ($usuario->id === auth()->id) {
+        if ($usuario->id === auth()->id()) {
             return response()->json(['message' => 'No puedes eliminarte a ti mismo'], 403);
         }
 
