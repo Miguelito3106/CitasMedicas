@@ -1,28 +1,30 @@
 # 📅 API de Gestión de Citas Médicas
 
-API RESTful desarrollada en **Laravel 10** para administrar citas médicas, médicos, pacientes, consultorios y horarios de atención.  
-Incluye autenticación con **Laravel Sanctum** (token-based) para proteger rutas y facilitar la integración con aplicaciones frontend o móviles.
+API RESTful desarrollada en **Laravel 10** para administrar citas médicas,
+médicos, pacientes, consultorios y horarios de atención.\
+Incluye autenticación con **Laravel Sanctum** (token-based) para proteger rutas
+y facilitar la integración con aplicaciones frontend o móviles.
 
 ---
 
 ## ✨ Características
 
-✅ **Autenticación con tokens** mediante Laravel Sanctum.  
-✅ **CRUD completo** de citas, médicos, pacientes, consultorios y horarios.  
-✅ **Protección de rutas** con middleware `auth:sanctum`.  
-✅ **Validación de datos** usando Form Requests.  
-✅ **Respuestas en formato JSON** listas para consumo en frontends (Vue, React, Angular, React Native).  
-✅ **Compatibilidad con Postman** (colección incluida en el repositorio).  
-✅ **Pruebas automáticas** para garantizar la calidad del código.  
+✅ **Autenticación con tokens** mediante Laravel Sanctum.\
+✅ **CRUD completo** de citas, médicos, pacientes, consultorios y horarios.\
+✅ **Protección de rutas** con middleware `auth:sanctum`.\
+✅ **Validación de datos** usando Form Requests.\
+✅ **Respuestas en formato JSON** listas para consumo en frontends (Vue, React,
+Angular, React Native).\
+✅ **Compatibilidad con Postman** (colección incluida en el repositorio).\
+✅ **Pruebas automáticas** para garantizar la calidad del código.
 
 ---
-
-
 
 ## ⚙️ Instalación y Configuración
 
 1. **Clonar el repositorio:**
-```bash
+
+
 git clone https://github.com/tu-usuario/api-citas-medicas.git
 cd api-citas-medicas
 
@@ -60,6 +62,7 @@ php artisan serve
 La API estará disponible en:
 👉 http://127.0.0.1:8000
 
+
 🔑 Autenticación
 La API usa Laravel Sanctum para autenticación basada en tokens.
 Flujo típico:
@@ -85,7 +88,9 @@ Cerrar sesión:
 POST /api/logout
 Elimina el token activo.
 
-🛣️ Rutas Principales (Endpoints)
+
+
+ Rutas Principales (Endpoints)
 Método	Ruta	Descripción	Protegida
 POST	/api/register	Registro de usuario	
 POST	/api/login	Inicio de sesión	
@@ -129,7 +134,7 @@ public function test_usuario_autenticado_puede_crear_cita()
 
 
 
-🧰 Herramientas de Desarrollo
+ Herramientas de Desarrollo
 Laravel 10
 
 Sanctum (autenticación)
@@ -151,7 +156,7 @@ Configura la variable {{token}} en Postman.
 
 Prueba los endpoints protegidos (Citas, Médicos, etc.).
 
-🚀 Despliegue en Producción
+ Despliegue en Producción
 Configura un servidor con PHP 8.2+, Composer y MySQL.
 
 Configura el archivo .env con credenciales de producción.
@@ -166,7 +171,7 @@ php artisan route:cache
 php artisan migrate --force
 Usa un servidor web como Nginx o Apache apuntando a /public.
 
-📜 Licencia
+ Licencia
 Este proyecto está bajo la licencia MIT.
 Puedes usarlo, modificarlo y distribuirlo libremente.
-
+```

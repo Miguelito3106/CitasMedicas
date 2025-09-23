@@ -2,31 +2,49 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Medicos extends Model
+class Medico extends Model
 {
-    protected $table = 'medicos';
+    use HasFactory;
+
     protected $fillable = [
         'nombre',
-        'apellido', 
+        'apellido',
         'documento',
         'email',
-        'telefono'
+        'telefono',
+        'user_id'
     ];
-    
+
+    // Relación con usuario
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // Relación con consultorios
+    public function consultorios()
+    {
+        return $this->hasMany(Consultorio::class, 'idMedico');
+    }
+
+    // Relación con horarios
+    public function horarios()
+    {
+        return $this->hasMany(HorarioMedico::class, 'medico_id');
+    }
+
+    // Relación con citas
     public function citas()
     {
-        return $this->hasMany(Citas::class, 'idMedico');
+        return $this->hasMany(Cita::class, 'idMedico');
     }
-    
-    public function consultorio()
+
+    // Accesor para nombre completo
+    public function getNombreCompletoAttribute()
     {
-        return $this->hasOne(Consultorios::class, 'idMedico');    
-    }
-    
-    public function horariosMedicos()
-    {
-        return $this->hasMany(HorariosMedicos::class, 'medico_id');
+        return "{$this->nombre} {$this->apellido}";
     }
 }

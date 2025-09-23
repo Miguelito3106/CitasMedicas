@@ -6,10 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('medicos', function (Blueprint $table) {
             $table->id();
@@ -17,15 +14,13 @@ return new class extends Migration
             $table->string('apellido');
             $table->string('documento')->unique();
             $table->string('email')->unique();
-            $table->string('telefono', 20)->nullable(); // Corregido: string en lugar de numeric
+            $table->string('telefono', 20)->nullable();
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('medicos');
     }
