@@ -39,6 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('medicos/{id}/citas', [MedicosController::class, 'citas']);
 
     // Rutas para pacientes
+    Route::apiResource('listarpacientes', PacientesController::class)->only(['index', 'show']);
     Route::apiResource('pacientes', PacientesController::class);
     Route::get('pacientes/{id}/citas', [PacientesController::class, 'citas']);
 
