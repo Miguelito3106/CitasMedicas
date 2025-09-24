@@ -26,42 +26,59 @@ Route::middleware('auth:sanctum')->group(function () {
     // Logout
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // Rutas para citas
-    Route::apiResource('citas', CitaController::class);
-    Route::get('citas/medico/{medicoId}', [CitaController::class, 'citasPorMedico']);
-    Route::get('citas/paciente/{pacienteId}', [CitaController::class, 'citasPorPaciente']);
-    Route::put('citas/{id}/estado', [CitaController::class, 'cambiarEstado']);
+/*
+|--------------------------------------------------------------------------
+| API de Usuarios
+|--------------------------------------------------------------------------
+*/
+Route::get('usuarios', [UsuarioController::class, 'index']);     // Listar todos ✅
+Route::post('usuarios', [UsuarioController::class, 'store']);    // Crear ✅
+Route::get('usuarios/{id}', [UsuarioController::class, 'show']); // Ver uno ✅
+Route::put('usuarios/{id}', [UsuarioController::class, 'update']);// Editar ✅
+Route::delete('usuarios/{id}', [UsuarioController::class, 'destroy']); // Eliminar ✅
 
-    // Rutas para médicos
-    Route::apiResource('medicos', MedicosController::class);
-    Route::get('medicos/{id}/horarios', [MedicosController::class, 'horarios']);
-    Route::get('medicos/{id}/consultorios', [MedicosController::class, 'consultorios']);
-    Route::get('medicos/{id}/citas', [MedicosController::class, 'citas']);
+/*
+|--------------------------------------------------------------------------
+| API de Pacientes
+|--------------------------------------------------------------------------
+*/
+Route::get('pacientes', [PacienteController::class, 'index']);     
+Route::post('pacientes', [PacienteController::class, 'store']);    
+Route::get('pacientes/{id}', [PacienteController::class, 'show']); 
+Route::put('pacientes/{id}', [PacienteController::class, 'update']);
+Route::delete('pacientes/{id}', [PacienteController::class, 'destroy']);
 
-    // Rutas para pacientes
-    Route::apiResource('listarpacientes', PacientesController::class)->only(['index', 'show']);
-    Route::apiResource('pacientes', PacientesController::class);
-    Route::get('pacientes/{id}/citas', [PacientesController::class, 'citas']);
+/*
+|--------------------------------------------------------------------------
+| API de Especialidades
+|--------------------------------------------------------------------------
+*/
+Route::get('especialidades', [EspecialidadController::class, 'index']);     
+Route::post('especialidades', [EspecialidadController::class, 'store']);    
+Route::get('especialidades/{id}', [EspecialidadController::class, 'show']); 
+Route::put('especialidades/{id}', [EspecialidadController::class, 'update']);
+Route::delete('especialidades/{id}', [EspecialidadController::class, 'destroy']);
 
-    // Rutas para consultorios
-    Route::apiResource('consultorios', ConsultoriosController::class);
-    Route::get('consultorios/disponibles', [ConsultoriosController::class, 'disponibles']);
+/*
+|--------------------------------------------------------------------------
+| API de Médicos
+|--------------------------------------------------------------------------
+*/
+Route::get('medicos', [MedicoController::class, 'index']);     
+Route::post('medicos', [MedicoController::class, 'store']);    
+Route::get('medicos/{id}', [MedicoController::class, 'show']); 
+Route::put('medicos/{id}', [MedicoController::class, 'update']);
+Route::delete('medicos/{id}', [MedicoController::class, 'destroy']);
 
-    // Rutas para horarios médicos
-    Route::apiResource('horarios-medicos', HorariosMedicosController::class);
-    Route::get('horarios-medicos/medico/{medicoId}', [HorariosMedicosController::class, 'porMedico']);
-});
+/*
+|--------------------------------------------------------------------------
+| API de Citas
+|--------------------------------------------------------------------------
+*/
+Route::get('citas', [CitaController::class, 'index']);     
+Route::post('citas', [CitaController::class, 'store']);    
+Route::get('citas/{id}', [CitaController::class, 'show']); 
+Route::put('citas/{id}', [CitaController::class, 'update']);
+Route::delete('citas/{id}', [CitaController::class, 'destroy']);
 
-// Rutas públicas (sin autenticación)
-Route::get('medicos', [MedicosController::class, 'index']);
-Route::get('medicos/{id}', [MedicosController::class, 'show']);
-Route::get('medicos/{id}/horarios-disponibles', [MedicosController::class, 'horariosDisponibles']);
-
-// Health check
-Route::get('/health', function () {
-    return response()->json([
-        'success' => true,
-        'message' => 'API EPS Clínica funcionando correctamente',
-        'timestamp' => now()->toDateTimeString()
-    ]);
 });
