@@ -126,7 +126,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Usuario no encontrado'], 404);
         }
 
-        if ($usuario->id === auth()->user()->id) {
+        if ($usuario->id === Auth::user()->id) {
             return response()->json(['message' => 'No puedes eliminarte a ti mismo'], 403);
         }
 

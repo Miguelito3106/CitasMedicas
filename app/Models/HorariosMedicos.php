@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class HorarioMedico extends Model
+class HorariosMedicos extends Model
 {
     use HasFactory;
+
+    protected $table = 'horarios_medicos';
 
     protected $fillable = [
         'medico_id',
@@ -16,26 +18,8 @@ class HorarioMedico extends Model
         'hora_fin'
     ];
 
-    protected $casts = [
-        'hora_inicio' => 'datetime:H:i',
-        'hora_fin' => 'datetime:H:i'
-    ];
-
-    // Relación con médico
     public function medico()
     {
-        return $this->belongsTo(Medico::class);
-    }
-
-    // Scope para un día específico
-    public function scopeDelDia($query, $dia)
-    {
-        return $query->where('dia_semana', $dia);
-    }
-
-    // Accesor para horario formateado
-    public function getHorarioFormateadoAttribute()
-    {
-        return "{$this->hora_inicio} - {$this->hora_fin}";
+        return $this->belongsTo(Medicos::class, 'medico_id');
     }
 }

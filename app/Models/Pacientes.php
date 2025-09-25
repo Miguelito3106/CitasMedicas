@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Paciente extends Model
+class Pacientes extends Model
 {
     use HasFactory;
 
@@ -28,7 +28,7 @@ class Paciente extends Model
     // Relación con citas
     public function citas()
     {
-        return $this->hasMany(Cita::class, 'idPaciente');
+        return $this->hasMany(Citas::class, 'idPaciente');
     }
 
     // Accesor para nombre completo

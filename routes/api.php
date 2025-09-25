@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\CitaController;
+use App\Http\Controllers\CitasController;
 use App\Http\Controllers\MedicosController;
 use App\Http\Controllers\PacientesController;
 use App\Http\Controllers\ConsultoriosController;
@@ -17,68 +17,39 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::middleware('auth:sanctum')->group(function () {
     // Ruta para obtener usuario actual
     Route::get('/user', function (Request $request) {
-        return response()->json([
-            'success' => true,
-            'data' => $request->user()
-        ]);
+        return $request->user();
     });
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout']);
 
-/*
-|--------------------------------------------------------------------------
-| API de Usuarios
-|--------------------------------------------------------------------------
-*/
-Route::get('usuarios', [UsuarioController::class, 'index']);     // Listar todos ✅
-Route::post('usuarios', [UsuarioController::class, 'store']);    // Crear ✅
-Route::get('usuarios/{id}', [UsuarioController::class, 'show']); // Ver uno ✅
-Route::put('usuarios/{id}', [UsuarioController::class, 'update']);// Editar ✅
-Route::delete('usuarios/{id}', [UsuarioController::class, 'destroy']); // Eliminar ✅
 
-/*
-|--------------------------------------------------------------------------
-| API de Pacientes
-|--------------------------------------------------------------------------
-*/
-Route::get('pacientes', [PacienteController::class, 'index']);     
-Route::post('pacientes', [PacienteController::class, 'store']);    
-Route::get('pacientes/{id}', [PacienteController::class, 'show']); 
-Route::put('pacientes/{id}', [PacienteController::class, 'update']);
-Route::delete('pacientes/{id}', [PacienteController::class, 'destroy']);
+    Route::get('listarpacientes', [PacientesController::class, 'index']);    
+    Route::post('crearpacientes', [PacientesController::class, 'store']);   
+    Route::put('editarpacientes/{id}', [PacientesController::class, 'update']); 
+    Route::delete('eliminarpacientes/{id}', [PacientesController::class, 'destroy']); 
 
-/*
-|--------------------------------------------------------------------------
-| API de Especialidades
-|--------------------------------------------------------------------------
-*/
-Route::get('especialidades', [EspecialidadController::class, 'index']);     
-Route::post('especialidades', [EspecialidadController::class, 'store']);    
-Route::get('especialidades/{id}', [EspecialidadController::class, 'show']); 
-Route::put('especialidades/{id}', [EspecialidadController::class, 'update']);
-Route::delete('especialidades/{id}', [EspecialidadController::class, 'destroy']);
 
-/*
-|--------------------------------------------------------------------------
-| API de Médicos
-|--------------------------------------------------------------------------
-*/
-Route::get('medicos', [MedicoController::class, 'index']);     
-Route::post('medicos', [MedicoController::class, 'store']);    
-Route::get('medicos/{id}', [MedicoController::class, 'show']); 
-Route::put('medicos/{id}', [MedicoController::class, 'update']);
-Route::delete('medicos/{id}', [MedicoController::class, 'destroy']);
+    Route::get('listarmedicos', [MedicosController::class, 'index']);     
+    Route::post('crearmedicos', [MedicosController::class, 'store']);    
+    Route::put('editarmedicos/{id}', [MedicosController::class, 'update']); 
+    Route::delete('eliminarmedicos/{id}', [MedicosController::class, 'destroy']);
 
-/*
-|--------------------------------------------------------------------------
-| API de Citas
-|--------------------------------------------------------------------------
-*/
-Route::get('citas', [CitaController::class, 'index']);     
-Route::post('citas', [CitaController::class, 'store']);    
-Route::get('citas/{id}', [CitaController::class, 'show']); 
-Route::put('citas/{id}', [CitaController::class, 'update']);
-Route::delete('citas/{id}', [CitaController::class, 'destroy']);
 
+    Route::get('listarconsultorios', [ConsultoriosController::class, 'index']);     
+    Route::post('crearconsultorios', [ConsultoriosController::class, 'store']);    
+    Route::put('editarconsultorios/{id}', [ConsultoriosController::class, 'update']);
+    Route::delete('eliminarconsultorios/{id}', [ConsultoriosController::class, 'destroy']);
+
+
+    Route::get('listarhorarios', [HorariosMedicosController::class, 'index']);    
+    Route::post('crearhorarios', [HorariosMedicosController::class, 'store']);   
+    Route::put('editarhorarios/{id}', [HorariosMedicosController::class, 'update']); 
+    Route::delete('eliminarhorarios/{id}', [HorariosMedicosController::class, 'destroy']);
+
+
+    Route::get('listarcitas', [CitasController::class, 'index']);    
+    Route::post('crearcitas', [CitasController::class, 'store']);    
+    Route::put('editarcitas/{id}', [CitasController::class, 'update']); 
+    Route::delete('eliminarcitas/{id}', [CitasController::class, 'destroy']); 
 });

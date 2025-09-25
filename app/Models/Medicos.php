@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Medico extends Model
+class Medicos extends Model
 {
     use HasFactory;
+
+    protected $table = 'medicos'; // Especificar tabla explícitamente
 
     protected $fillable = [
         'nombre',
@@ -18,31 +20,26 @@ class Medico extends Model
         'user_id'
     ];
 
-    // Relación con usuario
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Relación con consultorios
     public function consultorios()
     {
-        return $this->hasMany(Consultorio::class, 'idMedico');
+        return $this->hasMany(Consultorios::class, 'idMedico');
     }
 
-    // Relación con horarios
     public function horarios()
     {
-        return $this->hasMany(HorarioMedico::class, 'medico_id');
+        return $this->hasMany(HorariosMedicos::class, 'medico_id');
     }
 
-    // Relación con citas
     public function citas()
     {
-        return $this->hasMany(Cita::class, 'idMedico');
+        return $this->hasMany(Citas::class, 'idMedico');
     }
 
-    // Accesor para nombre completo
     public function getNombreCompletoAttribute()
     {
         return "{$this->nombre} {$this->apellido}";

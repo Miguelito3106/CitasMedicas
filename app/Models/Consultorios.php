@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Consultorio extends Model
+class Consultorios extends Model
 {
     use HasFactory;
+
+    protected $table = 'consultorios';
 
     protected $fillable = [
         'BloqueConsultorio',
@@ -15,15 +17,8 @@ class Consultorio extends Model
         'idMedico'
     ];
 
-    // Relación con médico
     public function medico()
     {
-        return $this->belongsTo(Medico::class, 'idMedico');
-    }
-
-    // Accesor para consultorio completo
-    public function getConsultorioCompletoAttribute()
-    {
-        return "Bloque {$this->BloqueConsultorio} - Consultorio {$this->NumeroConsultorio}";
+        return $this->belongsTo(Medicos::class, 'idMedico');
     }
 }

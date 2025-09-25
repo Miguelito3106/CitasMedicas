@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Cita extends Model
+class Citas extends Model
 {
     use HasFactory;
 
@@ -26,13 +26,13 @@ class Cita extends Model
     // Relación con paciente
     public function paciente()
     {
-        return $this->belongsTo(Paciente::class, 'idPaciente');
+        return $this->belongsTo(Pacientes::class, 'idPaciente');
     }
 
     // Relación con médico
     public function medico()
     {
-        return $this->belongsTo(Medico::class, 'idMedico');
+        return $this->belongsTo(Medicos::class, 'idMedico');
     }
 
     // Scope para citas pendientes

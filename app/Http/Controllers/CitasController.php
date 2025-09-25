@@ -3,16 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cita;
+use App\Models\Citas;
 use App\Models\Medico;
-use App\Models\Paciente;
+use App\Models\Pacientes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class CitaController extends Controller
+class CitasController extends Controller
 {
     public function index()
     {
-        $citas = Cita::with(['paciente', 'medico'])
+        $citas = Citas::with(['paciente', 'medico'])
                     ->orderBy('fecha_cita', 'desc')
                     ->orderBy('hora_cita', 'desc')
                     ->get();
@@ -41,7 +42,7 @@ class CitaController extends Controller
         }
 
         // Verificar disponibilidad del médico
-        $citaExistente = Cita::where('idMedico', $request->idMedico)
+        $citaExistente = Citas::where('idMedico', $request->idMedico)
                             ->where('fecha_cita', $request->fecha_cita)
                             ->where('hora_cita', $request->hora_cita)
                             ->where('estado', '!=', 'cancelada')
@@ -54,7 +55,7 @@ class CitaController extends Controller
             ], 409);
         }
 
-        $cita = Cita::create($request->all());
+        $cita = Citas::create($request->all());
 
         return response()->json([
             'success' => true,
@@ -65,7 +66,7 @@ class CitaController extends Controller
 
     public function show($id)
     {
-        $cita = Cita::with(['paciente', 'medico'])->find($id);
+        $cita = Citas::with(['paciente', 'medico'])->find($id);
 
         if (!$cita) {
             return response()->json([
@@ -82,7 +83,7 @@ class CitaController extends Controller
 
     public function update(Request $request, $id)
     {
-        $cita = Cita::find($id);
+        $cita = Citas::find($id);
 
         if (!$cita) {
             return response()->json([
@@ -114,7 +115,7 @@ class CitaController extends Controller
 
     public function destroy($id)
     {
-        $cita = Cita::find($id);
+        $cita = Citas::find($id);
 
         if (!$cita) {
             return response()->json([
@@ -133,7 +134,7 @@ class CitaController extends Controller
 
     public function citasPorMedico($medicoId)
     {
-        $citas = Cita::with('paciente')
+        $citas = Citas::with('paciente')
                     ->where('idMedico', $medicoId)
                     ->where('fecha_cita', '>=', today())
                     ->orderBy('fecha_cita')
@@ -148,7 +149,7 @@ class CitaController extends Controller
 
     public function citasPorPaciente($pacienteId)
     {
-        $citas = Cita::with('medico')
+        $citas = Citas::with('medico')
                     ->where('idPaciente', $pacienteId)
                     ->orderBy('fecha_cita', 'desc')
                     ->orderBy('hora_cita', 'desc')
