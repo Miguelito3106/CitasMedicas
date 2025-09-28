@@ -14,7 +14,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['admin', 'medico', 'recepcionista'])->default('recepcionista');
+            // CAMBIO: Actualizar los roles
+            $table->enum('role', ['paciente', 'doctor', 'admin'])->default('paciente');
             $table->rememberToken();
             $table->timestamps();
         });

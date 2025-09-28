@@ -8,21 +8,26 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
+        // Verificar si el usuario está autenticado
+        if (!$request->user()) {
+            return response()->json([
+                'message' => 'No autenticado. Por favor inicie sesión.'
+            ], 401);
+        }
+
         $user = $request->user();
         
-        if (!$user) {
-            return response()->json(['message' => 'No autenticado'], 401);
-        }
-        
+        // Verificar si el usuario tiene alguno de los roles permitidos
         if (!in_array($user->role, $roles)) {
-            return response()->json(['message' => 'No autorizado para esta acción'], 403);
+            $rolesTexto = implode(', ', $roles);
+            return response()->json([
+                'message' => 'No autorizado para esta acción.',
+                'detail' => "Su rol actual es: {$user->role}. Roles permitidos: {$rolesTexto}",
+                'user_role' => $user->role,
+                'required_roles' => $roles
+            ], 403);
         }
         
         return $next($request);

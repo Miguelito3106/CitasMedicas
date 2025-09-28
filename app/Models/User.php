@@ -28,21 +28,29 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    // ACTUALIZAR: Métodos de verificación de roles
+    public function isPaciente()
+    {
+        return $this->role === 'paciente';
+    }
+
+    public function isDoctor()
+    {
+        return $this->role === 'doctor';
+    }
+
     public function isAdmin()
     {
         return $this->role === 'admin';
     }
 
-    public function isMedico()
+    // NUEVO: Relación con paciente
+    public function paciente()
     {
-        return $this->role === 'medico';
+        return $this->hasOne(Pacientes::class, 'user_id');
     }
 
-    public function isRecepcionista()
-    {
-        return $this->role === 'recepcionista';
-    }
-
+    // ACTUALIZAR: Relación con médico
     public function medico()
     {
         return $this->hasOne(Medicos::class, 'user_id');
