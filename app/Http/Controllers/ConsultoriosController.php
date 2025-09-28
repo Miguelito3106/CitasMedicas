@@ -19,7 +19,7 @@ class ConsultoriosController extends Controller
         $validator = Validator::make($request->all(), [
             'BloqueConsultorio' => 'required|string|max:255',
             'NumeroConsultorio' => 'required|string|max:255|unique:consultorios',
-            'idMedico' => 'required|exists:medicos,id|unique:consultorios,idMedico',
+            'idMedico' => 'required|exists:medicos,id', // QUITAR unique:consultorios,idMedico
         ]);
         
         if ($validator->fails()) {
@@ -49,7 +49,7 @@ class ConsultoriosController extends Controller
         $validator = Validator::make($request->all(), [
             'BloqueConsultorio' => 'sometimes|string|max:255',
             'NumeroConsultorio' => 'sometimes|string|max:255|unique:consultorios,NumeroConsultorio,' . $id,
-            'idMedico' => 'sometimes|exists:medicos,id|unique:consultorios,idMedico,' . $id,
+            'idMedico' => 'sometimes|exists:medicos,id', // QUITAR unique:consultorios,idMedico,' . $id
         ]);
 
         if ($validator->fails()) {
