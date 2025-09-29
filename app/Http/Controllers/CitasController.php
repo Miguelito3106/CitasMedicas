@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cita;
 use App\Models\Citas;
-use App\Models\Medico;
-use App\Models\Pacientes;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -13,151 +12,79 @@ class CitasController extends Controller
 {
     public function index()
     {
-        $citas = Citas::with(['paciente', 'medico'])
-                    ->orderBy('fecha_cita', 'desc')
-                    ->orderBy('hora_cita', 'desc')
-                    ->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $citas
-        ]);
+        $citas = Citas::with(['paciente', 'medico'])->get();
+        return response()->json($citas);
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'idPaciente' => 'required|exists:pacientes,id',
-            'idMedico' => 'required|exists:medicos,id',
-            'fecha_cita' => 'required|date|after_or_equal:today',
-            'hora_cita' => 'required|date_format:H:i',
-            'motivo' => 'required|string|max:500',
+            'medico_id' => 'required|exists:users,id',
+            'fecha' => 'required|date',
+            'hora' => 'required|string',
+            'motivo' => 'required|string',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'success' => false,
                 'errors' => $validator->errors()
             ], 422);
         }
 
-        // Verificar disponibilidad del médico
-        $citaExistente = Citas::where('idMedico', $request->idMedico)
-                            ->where('fecha_cita', $request->fecha_cita)
-                            ->where('hora_cita', $request->hora_cita)
-                            ->where('estado', '!=', 'cancelada')
-                            ->exists();
-
-        if ($citaExistente) {
-            return response()->json([
-                'success' => false,
-                'message' => 'El médico ya tiene una cita programada para esa fecha y hora'
-            ], 409);
-        }
-
-        $cita = Citas::create($request->all());
+        $cita = Citas::create([
+            'paciente_id' => $request->user()->id,
+            'medico_id' => $request->medico_id,
+            'fecha' => $request->fecha,
+            'hora' => $request->hora,
+            'motivo' => $request->motivo,
+            'estado' => 'pendiente',
+        ]);
 
         return response()->json([
-            'success' => true,
             'message' => 'Cita creada exitosamente',
-            'data' => $cita->load(['paciente', 'medico'])
+            'cita' => $cita->load('medico')
         ], 201);
     }
 
-    public function show($id)
+    public function citasPaciente(Request $request)
     {
-        $cita = Citas::with(['paciente', 'medico'])->find($id);
-
-        if (!$cita) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cita no encontrada'
-            ], 404);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $cita
-        ]);
+        $citas = Citas::where('paciente_id', $request->user()->id)
+                    ->with('medico')
+                    ->get();
+        
+        return response()->json($citas);
     }
 
-    public function update(Request $request, $id)
+    public function citasMedico(Request $request)
     {
-        $cita = Citas::find($id);
+        $citas = Citas::where('medico_id', $request->user()->id)
+                    ->with('paciente')
+                    ->get();
+        
+        return response()->json($citas);
+    }
 
-        if (!$cita) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cita no encontrada'
-            ], 404);
-        }
+    public function actualizarEstado(Request $request, $id)
+    {
+        $cita = Citas::where('medico_id', $request->user()->id)
+                    ->where('id', $id)
+                    ->firstOrFail();
 
         $validator = Validator::make($request->all(), [
-            'estado' => 'sometimes|in:pendiente,confirmada,cancelada,atendida',
-            'motivo' => 'sometimes|string|max:500',
+            'estado' => 'required|in:confirmada,cancelada,completada',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'success' => false,
                 'errors' => $validator->errors()
             ], 422);
         }
 
-        $cita->update($request->all());
+        $cita->update(['estado' => $request->estado]);
 
         return response()->json([
-            'success' => true,
-            'message' => 'Cita actualizada exitosamente',
-            'data' => $cita->load(['paciente', 'medico'])
-        ]);
-    }
-
-    public function destroy($id)
-    {
-        $cita = Citas::find($id);
-
-        if (!$cita) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cita no encontrada'
-            ], 404);
-        }
-
-        $cita->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Cita eliminada exitosamente'
-        ]);
-    }
-
-    public function citasPorMedico($medicoId)
-    {
-        $citas = Citas::with('paciente')
-                    ->where('idMedico', $medicoId)
-                    ->where('fecha_cita', '>=', today())
-                    ->orderBy('fecha_cita')
-                    ->orderBy('hora_cita')
-                    ->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $citas
-        ]);
-    }
-
-    public function citasPorPaciente($pacienteId)
-    {
-        $citas = Citas::with('medico')
-                    ->where('idPaciente', $pacienteId)
-                    ->orderBy('fecha_cita', 'desc')
-                    ->orderBy('hora_cita', 'desc')
-                    ->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $citas
+            'message' => 'Estado de cita actualizado',
+            'cita' => $cita
         ]);
     }
 }

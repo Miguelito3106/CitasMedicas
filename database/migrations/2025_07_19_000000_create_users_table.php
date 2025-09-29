@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
+    public function up()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
@@ -14,14 +14,16 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            // CAMBIO: Actualizar los roles
-            $table->enum('role', ['paciente', 'doctor', 'admin'])->default('paciente');
+            $table->string('role')->default('paciente');
+            $table->string('especialidad')->nullable();
+            $table->string('telefono')->nullable();
+            $table->date('fecha_nacimiento')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
     }
 
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('users');
     }

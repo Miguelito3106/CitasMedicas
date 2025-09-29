@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,46 +11,26 @@ class Citas extends Model
     use HasFactory;
 
     protected $fillable = [
-        'idPaciente',
-        'idMedico',
-        'fecha_cita',
-        'hora_cita',
+        'paciente_id',
+        'medico_id',
+        'fecha',
+        'hora',
+        'motivo',
         'estado',
-        'motivo'
+        'notas'
     ];
 
     protected $casts = [
-        'fecha_cita' => 'date',
-        'hora_cita' => 'datetime:H:i'
+        'fecha' => 'date',
     ];
 
-    // Relación con paciente
     public function paciente()
     {
-        return $this->belongsTo(Pacientes::class, 'idPaciente');
+        return $this->belongsTo(User::class, 'paciente_id');
     }
 
-    // Relación con médico
     public function medico()
     {
-        return $this->belongsTo(Medicos::class, 'idMedico');
-    }
-
-    // Scope para citas pendientes
-    public function scopePendientes($query)
-    {
-        return $query->where('estado', 'pendiente');
-    }
-
-    // Scope para citas de hoy
-    public function scopeDeHoy($query)
-    {
-        return $query->where('fecha_cita', today());
-    }
-
-    // Accesor para fecha y hora completa
-    public function getFechaHoraCompletaAttribute()
-    {
-        return "{$this->fecha_cita->format('d/m/Y')} a las {$this->hora_cita}";
+        return $this->belongsTo(User::class, 'medico_id');
     }
 }

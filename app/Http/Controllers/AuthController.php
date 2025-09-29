@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
-use App\Models\User;
-use App\Models\Pacientes;
-use App\Models\Medicos;
 
 class AuthController extends Controller
 {
@@ -16,176 +14,103 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'role' => 'required|in:paciente,doctor,admin',
-            // Campos específicos para paciente
-            'documento' => 'required_if:role,paciente|string|unique:pacientes,documento',
-            'fecha_nacimiento' => 'required_if:role,paciente|date',
-            'telefono' => 'required_if:role,paciente|string|max:20',
-            'genero' => 'required_if:role,paciente|in:M,F',
-            'direccion' => 'required_if:role,paciente|string',
-            // Campos específicos para doctor
-            'licencia_medica' => 'required_if:role,doctor|string|unique:medicos,licencia_medica',
-            'especialidad' => 'required_if:role,doctor|string',
-            'documento_medico' => 'required_if:role,doctor|string|unique:medicos,documento',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6|confirmed', // Reducido a min:6 para testing
+            'role' => 'required|in:admin,medico,paciente',
+            'especialidad' => 'required_if:role,medico',
+            'telefono' => 'nullable|string|max:15', // Cambiado a nullable
+            'fecha_nacimiento' => 'nullable|date', // Cambiado a nullable
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        // Determinar el rol (si es admin, verificar permisos)
-        $role = $request->role;
-        if ($role === 'admin') {
-            // Solo usuarios autenticados pueden crear admins
-            if (!$request->user() || !$request->user()->isAdmin()) {
-                return response()->json([
-                    'message' => 'No autorizado para crear usuarios administrador'
-                ], 403);
-            }
-        }
-
-        // Crear usuario
-        $user = User::create([
+        $userData = [
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $role,
-        ]);
+            'role' => $request->role,
+        ];
 
-        // Crear datos específicos según el rol
-        if ($role === 'paciente') {
-            Pacientes::create([
-                'user_id' => $user->id,
-                'nombre' => $request->name,
-                'apellido' => '',
-                'documento' => $request->documento,
-                'fecha_nacimiento' => $request->fecha_nacimiento,
-                'telefono' => $request->telefono,
-                'genero' => $request->genero,
-                'direccion' => $request->direccion,
-            ]);
-        } elseif ($role === 'doctor') {
-            Medicos::create([
-                'user_id' => $user->id,
-                'nombre' => $request->name,
-                'apellido' => '',
-                'documento' => $request->documento_medico,
-                'email' => $request->email,
-                'telefono' => $request->telefono,
-                'licencia_medica' => $request->licencia_medica,
-                'especialidad' => $request->especialidad,
-            ]);
+        // Solo agregar si están presentes y no son nulos
+        if ($request->filled('telefono')) {
+            $userData['telefono'] = $request->telefono;
         }
+
+        if ($request->filled('fecha_nacimiento')) {
+            $userData['fecha_nacimiento'] = $request->fecha_nacimiento;
+        }
+
+        if ($request->role === 'medico' && $request->filled('especialidad')) {
+            $userData['especialidad'] = $request->especialidad;
+        }
+
+        $user = User::create($userData);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Usuario registrado correctamente',
-            'user' => $user->load(['paciente', 'medico']),
-            'token' => $token,
+            'message' => 'Usuario registrado exitosamente',
+            'user' => $user,
+            'access_token' => $token,
+            'token_type' => 'Bearer',
         ], 201);
     }
 
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email',
-            'password' => 'required|string',
+            'email' => 'required|email',
+            'password' => 'required',
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => 'Credenciales inválidas'], 401);
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return response()->json([
+                'message' => 'Credenciales inválidas'
+            ], 401);
         }
 
+        $user = User::where('email', $request->email)->firstOrFail();
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Inicio de sesión exitoso',
-            'user' => $user->load(['paciente', 'medico']),
-            'token' => $token,
-        ], 200);
+            'message' => 'Login exitoso',
+            'user' => $user,
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
+        $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'message' => 'Sesión cerrada correctamente'
+            'message' => 'Sesión cerrada exitosamente'
         ]);
     }
 
-    public function me(Request $request)
+    public function userProfile(Request $request)
     {
         return response()->json([
-            'user' => $request->user()->load(['paciente', 'medico'])
+            'user' => $request->user()
         ]);
     }
 
-    public function indexUsuarios()
+    public function checkAuth(Request $request)
     {
-        // Solo administradores pueden ver todos los usuarios
-        if (Auth::user()->role !== 'admin') {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
-
-        $usuarios = User::with(['paciente', 'medico'])->get();
-        return response()->json($usuarios);
-    }
-
-    public function actualizarUsuario(Request $request, $id)
-    {
-        // Solo administradores pueden actualizar usuarios
-        if (Auth::user()->role !== 'admin') {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
-
-        $usuario = User::find($id);
-        
-        if (!$usuario) {
-            return response()->json(['message' => 'Usuario no encontrado'], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|string|email|unique:users,email,' . $id,
-            'role' => 'sometimes|in:paciente,doctor,admin'
+        return response()->json([
+            'authenticated' => Auth::check(),
+            'user' => $request->user()
         ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        $usuario->update($validator->validated());
-        return response()->json($usuario->load(['paciente', 'medico']));
-    }
-
-    public function eliminarUsuario($id)
-    {
-        // Solo administradores pueden eliminar usuarios
-        if (Auth::user()->role !== 'admin') {
-            return response()->json(['message' => 'No autorizado'], 403);
-        }
-
-        $usuario = User::find($id);
-        
-        if (!$usuario) {
-            return response()->json(['message' => 'Usuario no encontrado'], 404);
-        }
-
-        if ($usuario->id === Auth::user()->id) {
-            return response()->json(['message' => 'No puedes eliminarte a ti mismo'], 403);
-        }
-
-        $usuario->delete();
-        return response()->json(['message' => 'Usuario eliminado correctamente']);
     }
 }

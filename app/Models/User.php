@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -15,7 +16,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role'
+        'role',
+        'especialidad',
+        // telefono y fecha_nacimiento son opcionales ahora
     ];
 
     protected $hidden = [
@@ -25,34 +28,31 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'fecha_nacimiento' => 'date',
     ];
-
-    // ACTUALIZAR: Métodos de verificación de roles
-    public function isPaciente()
-    {
-        return $this->role === 'paciente';
-    }
-
-    public function isDoctor()
-    {
-        return $this->role === 'doctor';
-    }
 
     public function isAdmin()
     {
         return $this->role === 'admin';
     }
 
-    // NUEVO: Relación con paciente
-    public function paciente()
+    public function isMedico()
     {
-        return $this->hasOne(Pacientes::class, 'user_id');
+        return $this->role === 'medico';
     }
 
-    // ACTUALIZAR: Relación con médico
-    public function medico()
+    public function isPaciente()
     {
-        return $this->hasOne(Medicos::class, 'user_id');
+        return $this->role === 'paciente';
+    }
+
+    public function citasComoPaciente()
+    {
+        return $this->hasMany(Citas::class, 'paciente_id');
+    }
+
+    public function citasComoMedico()
+    {
+        return $this->hasMany(Citas::class, 'medico_id');
     }
 }
