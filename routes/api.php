@@ -12,10 +12,11 @@ use Illuminate\Support\Facades\Route;
 // Rutas públicas de autenticación
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
-  Route::get('/me', [AuthController::class, 'me']);
+  
 
 // Rutas protegidas
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/me', [AuthController::class, 'me']);
     // Ruta para obtener usuario actual
     Route::get('/user', function (Request $request) {
         return $request->user()->load(['paciente', 'medico']);
